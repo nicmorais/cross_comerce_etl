@@ -9,7 +9,7 @@ defmodule CrossComerceEtl.ExtractTransform do
     numbers = Repo.all(numbers)
     if length(numbers) < 1 do
       url = "http://challenge.dienekes.com.br/api/numbers?page="
-      numbers = append_numbers(url, 9000)
+      numbers = append_numbers(url, 9999)
       Enum.map(quicksort(numbers), fn val -> Repo.insert(%Number{value: val}) end)
     end
   end
@@ -21,7 +21,7 @@ defmodule CrossComerceEtl.ExtractTransform do
     response = fetch_numbers(url)
     response_numbers = Poison.decode!(response.body)["numbers"]
     
-    IO.inspect(response)
+    #IO.inspect(response)
     
     case response_numbers do
       resp when resp != [] -> response_numbers ++ append_numbers(baseUrl, page + 1)
@@ -29,21 +29,21 @@ defmodule CrossComerceEtl.ExtractTransform do
     end
   end
 
-  defp quicksort([]), do: []
+  def quicksort([]), do: []
 
-  defp quicksort([pivot|[]]), do: [pivot]
+  def quicksort([pivot|[]]), do: [pivot]
 
-  defp quicksort([pivot|tail]) do
+  def quicksort([pivot|tail]) do
     lower = Enum.filter(tail, fn(n) -> n < pivot  end)
     higher = Enum.filter(tail, fn(n) -> n > pivot  end)
     quicksort(lower) ++ [pivot] ++ quicksort(higher) 
   end
 
-  defp fetch_numbers(_, _retry = 0), do: :ignore
+  defp fetch_numbers(_, _retry = 0), do: []
 
   defp fetch_numbers(url, retry \\ 3) do
     response = HTTPoison.get!(url)
-    case status_code = response.status_code do
+    case response.status_code do
       200 -> response
       _ -> fetch_numbers(url, retry - 1)
     end
