@@ -5,7 +5,7 @@ defmodule CrossComerceEtl.ExtractTransform do
   def run() do
     baseUrl = "http://challenge.dienekes.com.br/api/numbers?page="
 
-    append_numbers(baseUrl, 9999)
+    append_numbers(baseUrl, 1)
     |> quicksort
     |> Enum.map(fn val -> Repo.insert(%Number{value: val}) end)
   end
@@ -36,10 +36,14 @@ defmodule CrossComerceEtl.ExtractTransform do
   def fetch_numbers(_, _retry = 0), do: []
 
   def fetch_numbers(url, retry \\ 3) do
-    response = HTTPoison.get!(url)
+    response = http_client().get!(url)
     case response.status_code do
       200 -> response
       _ -> fetch_numbers(url, retry - 1)
     end
+  end
+
+  defp http_client do
+    Application.get_env(:cross_comerce_etl, :http_client)
   end
 end

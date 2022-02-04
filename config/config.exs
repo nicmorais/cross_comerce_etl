@@ -18,6 +18,8 @@ config :cross_comerce_etl, CrossComerceEtlWeb.Endpoint,
   pubsub_server: CrossComerceEtl.PubSub,
   live_view: [signing_salt: "GIBCrIjb"]
 
+config :cross_comerce_etl, :http_client, HTTPoison
+
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",

@@ -14,9 +14,20 @@ defmodule CrossComerceEtl.ExtractTransformTest do
   end
 
   test "fetch_numbers/2" do
-    expect(HTTPoison.BaseMock, :get!, fn (_url) -> %HTTPoison.Response{body: "{\"numbers\":[2,3]}", status_code: 500 }  end)
+    expect(HTTPoison.BaseMock, :get!, 3, fn (_url) -> %HTTPoison.Response{body: "{\"numbers\":[2, 3]}", status_code: 200 }  end)
+    assert %HTTPoison.Response{body: "{\"numbers\":[2, 3]}", status_code: 200} = ExtractTransform.fetch_numbers("")
+  end
+
+  test "fetch_numbers/2 with error" do
+    expect(HTTPoison.BaseMock, :get!, 3, fn (_url) -> %HTTPoison.Response{body: "{\"numbers\":[]}", status_code: 500 }  end)
     assert [] = ExtractTransform.fetch_numbers("")
   end
 
+  test "append_numbers/2" do
+    expect(HTTPoison.BaseMock, :get!, 10, fn (url) -> case String.slice(url, -1, 1) do
+                                                      "1" -> "{\"numbers\": [1,2,3]}" 
+                                                      "2" ->  "{\"numbers\": []}" end end)
+    assert [] = ExtractTransform.append_numbers("http://challenge.dienekes.com.br/api/numbers?page=", 1)
+  end
 end
 
