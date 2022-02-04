@@ -2,10 +2,10 @@ defmodule CrossComerceEtl.ExtractTransform do
   alias CrossComerceEtl.Repo
   alias CrossComerceEtl.Numbers.Number
 
-  def run() do
+  def run(start_page \\ 1) do
     baseUrl = "http://challenge.dienekes.com.br/api/numbers?page="
 
-    append_numbers(baseUrl, 1)
+    append_numbers(baseUrl, start_page)
     |> quicksort
     |> Enum.map(fn val -> Repo.insert(%Number{value: val}) end)
   end
