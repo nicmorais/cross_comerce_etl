@@ -1,28 +1,22 @@
 defmodule CrossComerceEtl.ExtractTransform do
   alias CrossComerceEtl.Repo
   alias CrossComerceEtl.Numbers.Number
-  import Ecto.Query
 
   def run() do
-    IO.puts("Checking database...")
-    numbers = from n in Number, limit: 10
-    numbers = Repo.all(numbers)
-    if length(numbers) < 1 do
-      url = "http://challenge.dienekes.com.br/api/numbers?page="
-      numbers = append_numbers(url, 9999)
-      Enum.map(quicksort(numbers), fn val -> Repo.insert(%Number{value: val}) end)
-    end
+    baseUrl = "http://challenge.dienekes.com.br/api/numbers?page="
+
+    append_numbers(baseUrl, 9999)
+    |> quicksort
+    |> Enum.map(fn val -> Repo.insert(%Number{value: val}) end)
   end
-  
-  defp append_numbers(baseUrl, page) do
+
+  def append_numbers(baseUrl, page) do
     IO.puts("Page: " <> Integer.to_string(page))
     url = baseUrl <> Integer.to_string(page)
     
     response = fetch_numbers(url)
     response_numbers = Poison.decode!(response.body)["numbers"]
-    
-    #IO.inspect(response)
-    
+        
     case response_numbers do
       resp when resp != [] -> response_numbers ++ append_numbers(baseUrl, page + 1)
       _ -> []
@@ -39,9 +33,9 @@ defmodule CrossComerceEtl.ExtractTransform do
     quicksort(lower) ++ [pivot] ++ quicksort(higher) 
   end
 
-  defp fetch_numbers(_, _retry = 0), do: []
+  def fetch_numbers(_, _retry = 0), do: []
 
-  defp fetch_numbers(url, retry \\ 3) do
+  def fetch_numbers(url, retry \\ 3) do
     response = HTTPoison.get!(url)
     case response.status_code do
       200 -> response

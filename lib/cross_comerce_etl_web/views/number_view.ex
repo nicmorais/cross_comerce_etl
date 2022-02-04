@@ -11,6 +11,7 @@ defmodule CrossComerceEtlWeb.NumberView do
   end
 
   def render("number.json", %{number: number}) do
-    %{value: number.value}
+    %{id: number.id,
+      value: number.value}
   end
 end

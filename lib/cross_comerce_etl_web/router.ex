@@ -7,7 +7,7 @@ defmodule CrossComerceEtlWeb.Router do
 
   scope "/api", CrossComerceEtlWeb do
     pipe_through :api
-    resources "/numbers", NumberController, except: [:new, :edit]
+    get "/numbers", NumberController, :index
 
   end
 end

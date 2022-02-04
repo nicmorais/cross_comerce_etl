@@ -4,7 +4,6 @@ defmodule CrossComerceEtl.Application do
   @moduledoc false
 
   use Application
-  alias CrossComerceEtl.ExtractTransform
   
   def start(_type, _args) do
     children = [
@@ -24,7 +23,6 @@ defmodule CrossComerceEtl.Application do
     # for other strategies and supported options
     opts = [strategy: :one_for_one, name: CrossComerceEtl.Supervisor]
     ret = Supervisor.start_link(children, opts)
-    ExtractTransform.run
     ret
   end
 
