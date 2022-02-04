@@ -7,12 +7,11 @@ defmodule CrossComerceEtl.ExtractTransform do
     baseUrl = "http://challenge.dienekes.com.br/api/numbers?page="
 
     # get all numbers, sort them and insert into database
-    numbers =
-      append_numbers(baseUrl, start_page)
-      |> quicksort
-      |> Enum.map(fn number -> [value: number] end)
-
-    Repo.insert_all(Number, numbers)
+    append_numbers(baseUrl, start_page)
+    |> quicksort
+    |> Enum.map(fn number -> [value: number] end)
+    |> Enum.chunk_every(500)
+    |> Enum.map(fn numbers -> Repo.insert_all(Number, numbers) end)
   end
 
   # recursively get list of numbers and append them
